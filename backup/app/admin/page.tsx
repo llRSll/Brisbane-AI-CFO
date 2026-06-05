@@ -119,8 +119,17 @@ const AdminDashboard = () => {
   const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const text = await file.text();
-    setScheduleRaw(text);
+    flash("Reading file…");
+    const body = new FormData();
+    body.append("file", file);
+    const response = await fetch("/api/admin/extract", { method: "POST", body });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      flash(data.error ?? "Could not read file");
+      return;
+    }
+    setScheduleRaw(data.text ?? "");
+    flash("File loaded — review then publish");
   };
 
   const handlePublishSchedule = async (event: React.FormEvent) => {
@@ -278,11 +287,14 @@ const AdminDashboard = () => {
             <form onSubmit={handlePublishSchedule} className="flex flex-col gap-3">
               <input
                 type="file"
-                accept=".txt,.md,.csv"
+                accept=".docx,.txt,.md,.csv"
                 onChange={handleFile}
                 aria-label="Upload schedule file"
                 className="text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-white"
               />
+              <p className="text-xs text-white/40">
+                Word (.docx), text, markdown or CSV — or paste below.
+              </p>
               <textarea
                 value={scheduleRaw}
                 onChange={(event) => setScheduleRaw(event.target.value)}

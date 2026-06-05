@@ -32,6 +32,7 @@ export type QuestionGroup = {
   id: string;
   label: string;
   summary: string | null;
+  proposed_question: string | null;
   count: number;
   created_at: string;
 };

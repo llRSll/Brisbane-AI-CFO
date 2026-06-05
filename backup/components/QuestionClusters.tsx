@@ -7,59 +7,69 @@ type QuestionClustersProps = {
   large?: boolean;
 };
 
-const BUBBLE_COLORS = [
-  "from-brand/30 to-brand/5 border-brand/40",
-  "from-accent-pink/30 to-accent-pink/5 border-accent-pink/40",
-  "from-accent-cyan/30 to-accent-cyan/5 border-accent-cyan/40",
-  "from-accent-amber/30 to-accent-amber/5 border-accent-amber/40",
-  "from-accent-green/30 to-accent-green/5 border-accent-green/40",
+const COUNT_COLORS = [
+  "bg-brand/20 text-brand-light border-brand/40",
+  "bg-accent-pink/20 text-accent-pink border-accent-pink/40",
+  "bg-accent-cyan/20 text-accent-cyan border-accent-cyan/40",
+  "bg-accent-amber/20 text-accent-amber border-accent-amber/40",
+  "bg-accent-green/20 text-accent-green border-accent-green/40",
 ];
-
-// Scale a cluster's visual size by how many questions it merged.
-const sizeFor = (count: number, large: boolean): string => {
-  const base = large ? 150 : 110;
-  const px = base + Math.min(count - 1, 8) * (large ? 26 : 16);
-  return `${px}px`;
-};
 
 const QuestionClusters = ({ groups, large }: QuestionClustersProps) => {
   if (groups.length === 0) {
     return (
       <p className="text-center text-white/50">
-        No questions grouped yet. They will appear here as themes.
+        No questions grouped yet. Themes will appear here as a single
+        generalised question per topic.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4">
+    <ul className="flex flex-col gap-3">
       {groups.map((group, index) => {
-        const dimension = sizeFor(group.questions.length, Boolean(large));
+        const count = group.questions.length;
+        const proposed =
+          group.proposed_question?.trim() ||
+          group.questions[0]?.text ||
+          group.label;
         return (
-          <div
+          <li
             key={group.id}
-            className={`animate-pop-in flex flex-col items-center justify-center rounded-full border bg-gradient-to-br p-4 text-center ${
-              BUBBLE_COLORS[index % BUBBLE_COLORS.length]
-            }`}
-            style={{ width: dimension, height: dimension }}
-            title={group.summary ?? group.label}
+            className="animate-pop-in panel flex items-center gap-4 rounded-2xl p-4"
           >
-            <span
-              className={`font-bold ${large ? "text-2xl" : "text-base"}`}
+            <div
+              className={`flex shrink-0 flex-col items-center justify-center rounded-full border ${
+                COUNT_COLORS[index % COUNT_COLORS.length]
+              } ${large ? "h-20 w-20" : "h-14 w-14"}`}
             >
-              {group.questions.length}
-            </span>
-            <span
-              className={`mt-1 line-clamp-3 px-1 leading-tight text-white/80 ${
-                large ? "text-base" : "text-xs"
-              }`}
-            >
-              {group.label}
-            </span>
-          </div>
+              <span className={`font-bold ${large ? "text-3xl" : "text-xl"}`}>
+                {count}
+              </span>
+              <span className="text-[10px] uppercase tracking-wide opacity-70">
+                merged
+              </span>
+            </div>
+            <div className="min-w-0">
+              <p
+                className={`font-semibold leading-snug ${
+                  large ? "text-2xl" : "text-base"
+                }`}
+              >
+                {proposed}
+              </p>
+              <p
+                className={`mt-1 uppercase tracking-wide text-white/40 ${
+                  large ? "text-sm" : "text-xs"
+                }`}
+              >
+                {group.label}
+              </p>
+            </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 };
 

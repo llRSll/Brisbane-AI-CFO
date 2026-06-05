@@ -9,6 +9,7 @@ export type RawQuestion = { id: string; text: string };
 export type QuestionCluster = {
   label: string;
   summary: string;
+  question: string;
   questionIds: string[];
 };
 
@@ -33,6 +34,11 @@ const clusterSchema = z.object({
       summary: z
         .string()
         .describe("One sentence summarising what these questions ask"),
+      question: z
+        .string()
+        .describe(
+          "A single clear, generalised question that represents and combines all the questions in this group, phrased for the presenter to read aloud and answer",
+        ),
       questionIds: z.array(z.string()),
     }),
   ),
@@ -53,6 +59,9 @@ export const groupQuestions = async (
         "Group questions that ask about the same topic together.",
         "Keep distinct topics in separate clusters. Every question id must",
         "appear in exactly one cluster. Use the exact ids provided.",
+        "For each cluster, also write a single generalised question that",
+        "combines all the questions in the group into one clear question the",
+        "presenter can read aloud and answer.",
         "",
         "Questions (JSON):",
         JSON.stringify(questions),
@@ -80,17 +89,24 @@ const sanitiseClusters = (
     const ids = cluster.questionIds.filter((id) => known.has(id) && !seen.has(id));
     ids.forEach((id) => seen.add(id));
     if (ids.length > 0) {
+      const first = questions.find((q) => q.id === ids[0]);
       cleaned.push({
         label: cluster.label?.trim() || "General",
         summary: cluster.summary?.trim() || "",
+        question: cluster.question?.trim() || first?.text || "",
         questionIds: ids,
       });
     }
   }
 
-  const leftovers = questions.filter((q) => !seen.has(q.id)).map((q) => q.id);
+  const leftovers = questions.filter((q) => !seen.has(q.id));
   if (leftovers.length > 0) {
-    cleaned.push({ label: "Other", summary: "", questionIds: leftovers });
+    cleaned.push({
+      label: "Other",
+      summary: "",
+      question: leftovers[0].text,
+      questionIds: leftovers.map((q) => q.id),
+    });
   }
   return cleaned;
 };
@@ -141,9 +157,14 @@ const mockGroupQuestions = (questions: RawQuestion[]): QuestionCluster[] => {
 
   return clusters.map((cluster) => {
     const top = [...cluster.seed].slice(0, 3).join(" ");
+    // Use the longest question in the cluster as the representative one.
+    const representative = cluster.ids
+      .map((id) => questions.find((q) => q.id === id)!)
+      .sort((a, b) => b.text.length - a.text.length)[0];
     return {
       label: top ? capitalise(top) : "General",
       summary: "",
+      question: representative?.text ?? "",
       questionIds: cluster.ids,
     };
   });

@@ -30,6 +30,7 @@ export const POST = async () => {
       .insert({
         label: cluster.label,
         summary: cluster.summary || null,
+        proposed_question: cluster.question || null,
         count: cluster.questionIds.length,
       })
       .select("id")
