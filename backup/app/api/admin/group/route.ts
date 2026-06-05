@@ -18,7 +18,7 @@ export const POST = async () => {
     return NextResponse.json({ clusters: 0 });
   }
 
-  const clusters = await groupQuestions(questions);
+  const { clusters, engine, error } = await groupQuestions(questions);
 
   // Rebuild groups from scratch each run for a clean re-cluster.
   await supabase.from("questions").update({ group_id: null }).not("id", "is", null);
@@ -44,5 +44,5 @@ export const POST = async () => {
       .in("id", cluster.questionIds);
   }
 
-  return NextResponse.json({ clusters: clusters.length });
+  return NextResponse.json({ clusters: clusters.length, engine, error });
 };

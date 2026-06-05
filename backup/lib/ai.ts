@@ -6,6 +6,12 @@ import { z } from "zod";
 
 export type RawQuestion = { id: string; text: string };
 
+export type GroupResult = {
+  clusters: QuestionCluster[];
+  engine: "openai" | "mock";
+  error?: string;
+};
+
 export type QuestionCluster = {
   label: string;
   summary: string;
@@ -46,9 +52,15 @@ const clusterSchema = z.object({
 
 export const groupQuestions = async (
   questions: RawQuestion[],
-): Promise<QuestionCluster[]> => {
-  if (questions.length === 0) return [];
-  if (!hasOpenAI()) return mockGroupQuestions(questions);
+): Promise<GroupResult> => {
+  if (questions.length === 0) return { clusters: [], engine: "mock" };
+  if (!hasOpenAI()) {
+    return {
+      clusters: mockGroupQuestions(questions),
+      engine: "mock",
+      error: "OPENAI_API_KEY is not set",
+    };
+  }
 
   try {
     const { object } = await generateObject({
@@ -69,9 +81,18 @@ export const groupQuestions = async (
     });
 
     const valid = sanitiseClusters(object.clusters, questions);
-    return valid.length > 0 ? valid : mockGroupQuestions(questions);
-  } catch {
-    return mockGroupQuestions(questions);
+    if (valid.length > 0) return { clusters: valid, engine: "openai" };
+    return {
+      clusters: mockGroupQuestions(questions),
+      engine: "mock",
+      error: "AI returned no clusters",
+    };
+  } catch (error) {
+    return {
+      clusters: mockGroupQuestions(questions),
+      engine: "mock",
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 };
 

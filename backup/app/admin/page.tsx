@@ -67,9 +67,9 @@ const AdminDashboard = () => {
   const [scheduleRaw, setScheduleRaw] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
-  const flash = (message: string) => {
+  const flash = (message: string, durationMs = 3000) => {
     setStatus(message);
-    setTimeout(() => setStatus(null), 3000);
+    setTimeout(() => setStatus(null), durationMs);
   };
 
   const handleOptionChange = (index: number, value: string) => {
@@ -113,7 +113,16 @@ const AdminDashboard = () => {
     flash("Grouping…");
     const response = await fetch("/api/admin/group", { method: "POST" });
     const body = await response.json().catch(() => ({}));
-    flash(response.ok ? `Grouped into ${body.clusters} theme(s)` : "Grouping failed");
+    if (!response.ok) {
+      flash("Grouping failed");
+      return;
+    }
+    const engineLabel = body.engine === "openai" ? "AI" : "offline mock";
+    const suffix = body.error ? ` — reason: ${body.error}` : "";
+    flash(
+      `Grouped into ${body.clusters} theme(s) via ${engineLabel}${suffix}`,
+      12000,
+    );
   };
 
   const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
