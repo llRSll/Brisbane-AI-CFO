@@ -279,12 +279,16 @@ const AdminDashboard = () => {
               Group {data.questions.length} questions
             </button>
             {data.groupedQuestions.length > 0 ? (
-              <ul className="mt-4 flex flex-col gap-1 text-sm text-white/70">
+              <ul className="mt-4 flex flex-col gap-2 text-sm text-white/80">
                 {data.groupedQuestions.map((group) => (
-                  <li key={group.id} className="flex justify-between">
-                    <span>{group.label}</span>
-                    <span className="text-white/40">
+                  <li key={group.id} className="flex items-start gap-2">
+                    <span className="shrink-0 rounded-full bg-brand/20 px-2 py-0.5 text-xs font-semibold text-brand-light">
                       {group.questions.length}
+                    </span>
+                    <span>
+                      {group.proposed_question?.trim() ||
+                        group.questions[0]?.text ||
+                        group.label}
                     </span>
                   </li>
                 ))}
