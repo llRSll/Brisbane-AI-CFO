@@ -1,0 +1,12 @@
+---
+description: Push commits to GitHub after every commit
+alwaysApply: true
+---
+
+# Git workflow
+
+When the user asks you to commit changes, push to GitHub immediately after a successful commit unless they explicitly say not to push.
+
+- Use `git push -u origin HEAD` when pushing a new branch
+- Use `git push origin <branch>` when pushing to an existing tracked branch
+- Do not force-push to main/master unless explicitly requested
