@@ -7,6 +7,15 @@ alwaysApply: true
 
 When the user asks you to commit changes, push to GitHub immediately after a successful commit unless they explicitly say not to push.
 
+## Which repo to use
+
+- **OzGeeOm / Dine For A Dream app** (`ozgeeom/`): commit and push from inside `ozgeeom/` to `https://github.com/llRSll/DineForADream2026.git` (deploys to dine-for-a-dream.vercel.app).
+- **Monorepo root**: only for non-ozgeeom work; pushes to `https://github.com/llRSll/Brisbane-AI-CFO.git`.
+
+Do not push ozgeeom changes only to Brisbane-AI-CFO when the user wants the live app updated.
+
+## Push rules
+
 - Use `git push -u origin HEAD` when pushing a new branch
 - Use `git push origin <branch>` when pushing to an existing tracked branch
 - Do not force-push to main/master unless explicitly requested
