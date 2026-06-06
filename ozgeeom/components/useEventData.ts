@@ -10,6 +10,7 @@ import type {
   ScheduleItem,
   Vote,
 } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type EventData = {
   polls: Poll[];
@@ -25,8 +26,6 @@ export type EventData = {
   loading: boolean;
 };
 
-const supabase = createClient();
-
 export const useEventData = (): EventData => {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -35,7 +34,7 @@ export const useEventData = (): EventData => {
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadAll = useCallback(async () => {
+  const loadAll = useCallback(async (supabase: SupabaseClient) => {
     const [pollRes, voteRes, questionRes, groupRes, scheduleRes] =
       await Promise.all([
         supabase.from("polls").select("*").order("created_at", { ascending: false }),
@@ -54,15 +53,26 @@ export const useEventData = (): EventData => {
   }, []);
 
   useEffect(() => {
-    loadAll();
+    const supabase = createClient();
+    loadAll(supabase);
 
     const channel = supabase
       .channel("event-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "polls" }, loadAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, loadAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "questions" }, loadAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "question_groups" }, loadAll)
-      .on("postgres_changes", { event: "*", schema: "public", table: "schedule_items" }, loadAll)
+      .on("postgres_changes", { event: "*", schema: "public", table: "polls" }, () =>
+        loadAll(supabase),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, () =>
+        loadAll(supabase),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "questions" }, () =>
+        loadAll(supabase),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "question_groups" }, () =>
+        loadAll(supabase),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "schedule_items" }, () =>
+        loadAll(supabase),
+      )
       .subscribe();
 
     return () => {

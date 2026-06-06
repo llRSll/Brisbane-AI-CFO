@@ -8,6 +8,7 @@ import { branding } from "@/lib/branding";
 type FormState = {
   name: string;
   email: string;
+  table: string;
   company: string;
 };
 
@@ -16,7 +17,12 @@ const inputClassName =
 
 const JoinPage = () => {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>({ name: "", email: "", company: "" });
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    table: "",
+    company: "",
+  });
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -91,15 +97,28 @@ const JoinPage = () => {
 
             <label className="flex flex-col gap-1">
               <span className="text-sm text-ink-muted">
-                Table / group{" "}
-                <span className="text-ink-faint">(optional)</span>
+                Table <span className="text-ink-faint">(optional)</span>
+              </span>
+              <input
+                type="text"
+                value={form.table}
+                onChange={handleChange("table")}
+                aria-label="Your table"
+                placeholder="e.g. Table 5"
+                className={inputClassName}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm text-ink-muted">
+                Company <span className="text-ink-faint">(optional)</span>
               </span>
               <input
                 type="text"
                 value={form.company}
                 onChange={handleChange("company")}
-                aria-label="Your table or group"
-                placeholder="e.g. Table 5"
+                aria-label="Your company"
+                placeholder="e.g. Acme Inc."
                 className={inputClassName}
               />
             </label>
@@ -116,7 +135,7 @@ const JoinPage = () => {
             disabled={submitting}
             className="mt-6 w-full rounded-xl bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50"
           >
-            {submitting ? "Joining…" : `Join ${branding.eventTitle.toLowerCase()}`}
+            {submitting ? "Joining…" : `Join ${branding.eventTitle}`}
           </button>
         </form>
       </div>

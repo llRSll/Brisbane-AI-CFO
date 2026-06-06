@@ -1,6 +1,6 @@
-# OzGeeOm Charity Night
+# OzGeeOm — Dine For A Dream
 
-Live companion app for the OzGeeOm charity evening. Guests scan a QR code,
+Live companion app for the OzGeeOm **Dine For A Dream** charity evening. Guests scan a QR code,
 sign up, vote in live polls, and submit questions that get grouped into themes
 for Q&A. Includes a big-screen presenter view and an admin dashboard.
 
@@ -50,11 +50,15 @@ npm run dev
 - **Admin:** http://localhost:3000/admin
 - **Guests:** scan the QR on `/present` or share `/join`
 
-### 5. Deploy (recommended for the venue)
+### 5. Production (live)
 
-Deploy the `ozgeeom` folder to Vercel. Set the same env vars and update
-`NEXT_PUBLIC_BASE_URL` to your production URL so the QR code points to the
-right place.
+**https://dine-for-a-dream.vercel.app**
+
+| Screen    | URL                                              |
+| --------- | ------------------------------------------------ |
+| Presenter | https://dine-for-a-dream.vercel.app/present      |
+| Admin     | https://dine-for-a-dream.vercel.app/admin        |
+| Guest QR  | https://dine-for-a-dream.vercel.app/join         |
 
 ## Running the evening
 

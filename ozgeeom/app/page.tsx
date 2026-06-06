@@ -8,20 +8,19 @@ const HomePage = () => {
       <div className="accent-bar w-full" />
 
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-        <EventLogo size="lg" className="mb-8 justify-center" />
+        <EventLogo size="lg" className="mb-10 justify-center" />
 
-        <span className="mb-4 rounded-full border border-brand/20 bg-brand-light px-4 py-1 text-sm font-medium text-brand">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-brand">
+          {branding.name} presents
+        </p>
+        <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-6xl">
           {branding.eventTitle}
-        </span>
-
-        <h1 className="max-w-3xl font-display text-4xl font-bold leading-tight text-ink sm:text-5xl">
-          Join in, vote, and ask questions — live.
         </h1>
-        <p className="mt-4 max-w-xl text-lg text-ink-muted">
+        <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-muted">
           {branding.description}
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/join"
             className="rounded-xl bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark"

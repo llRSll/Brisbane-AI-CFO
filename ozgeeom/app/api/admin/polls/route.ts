@@ -3,16 +3,19 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/session";
 
+const optionsSchema = z.array(z.string().trim().min(1).max(120)).min(2).max(6);
+
 const createSchema = z.object({
   action: z.literal("create"),
   question: z.string().trim().min(1).max(300),
-  options: z.array(z.string().trim().min(1).max(120)).min(2).max(6),
+  options: optionsSchema,
 });
 
-const toggleSchema = z.object({
-  action: z.literal("toggle"),
+const updateSchema = z.object({
+  action: z.literal("update"),
   pollId: z.string().uuid(),
-  isOpen: z.boolean(),
+  question: z.string().trim().min(1).max(300),
+  options: optionsSchema,
 });
 
 const deleteSchema = z.object({
@@ -20,7 +23,22 @@ const deleteSchema = z.object({
   pollId: z.string().uuid(),
 });
 
-const bodySchema = z.union([createSchema, toggleSchema, deleteSchema]);
+const goLiveSchema = z.object({
+  action: z.literal("golive"),
+  pollId: z.string().uuid(),
+});
+
+const closeSchema = z.object({
+  action: z.literal("close"),
+});
+
+const bodySchema = z.union([
+  createSchema,
+  updateSchema,
+  deleteSchema,
+  goLiveSchema,
+  closeSchema,
+]);
 
 export const POST = async (request: Request) => {
   if (!(await isAdmin())) {
@@ -42,9 +60,20 @@ export const POST = async (request: Request) => {
       .select("*")
       .single();
     if (error) {
-      return NextResponse.json({ error: "Could not create poll" }, { status: 500 });
+      return NextResponse.json({ error: "Could not save poll" }, { status: 500 });
     }
     return NextResponse.json({ poll: data });
+  }
+
+  if (body.action === "update") {
+    const { error } = await supabase
+      .from("polls")
+      .update({ question: body.question, options: body.options })
+      .eq("id", body.pollId);
+    if (error) {
+      return NextResponse.json({ error: "Could not update poll" }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
   }
 
   if (body.action === "delete") {
@@ -53,16 +82,19 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ ok: true });
   }
 
-  // toggle: only one poll open at a time.
-  if (body.isOpen) {
-    await supabase.from("polls").update({ is_open: false }).neq("id", body.pollId);
+  if (body.action === "close") {
+    await supabase.from("polls").update({ is_open: false }).eq("is_open", true);
+    return NextResponse.json({ ok: true });
   }
+
+  // golive: close any other open poll, then open this one (one live at a time).
+  await supabase.from("polls").update({ is_open: false }).neq("id", body.pollId);
   const { error } = await supabase
     .from("polls")
-    .update({ is_open: body.isOpen })
+    .update({ is_open: true })
     .eq("id", body.pollId);
   if (error) {
-    return NextResponse.json({ error: "Could not update poll" }, { status: 500 });
+    return NextResponse.json({ error: "Could not start poll" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
 };

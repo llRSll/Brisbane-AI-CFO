@@ -2,6 +2,7 @@ export type Attendee = {
   id: string;
   name: string;
   email: string;
+  table_name: string | null;
   company: string | null;
   created_at: string;
 };

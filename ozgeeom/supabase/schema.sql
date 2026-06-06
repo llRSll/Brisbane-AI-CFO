@@ -8,6 +8,7 @@ create table if not exists public.attendees (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null unique,
+  table_name text,
   company text,
   created_at timestamptz not null default now()
 );
@@ -36,6 +37,7 @@ create table if not exists public.question_groups (
   id uuid primary key default gen_random_uuid(),
   label text not null,
   summary text,
+  proposed_question text,
   count int not null default 0,
   created_at timestamptz not null default now()
 );

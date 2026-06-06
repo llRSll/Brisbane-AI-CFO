@@ -6,6 +6,7 @@ import { setAttendeeId } from "@/lib/session";
 const bodySchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
   email: z.string().trim().email("Valid email required").max(200),
+  table: z.string().trim().max(120).optional().nullable(),
   company: z.string().trim().max(200).optional().nullable(),
 });
 
@@ -18,10 +19,9 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const { name, email, company } = parsed.data;
+  const { name, email, table, company } = parsed.data;
   const supabase = createAdminClient();
 
-  // Reuse an existing attendee with the same email so re-scanning is idempotent.
   const { data: existing } = await supabase
     .from("attendees")
     .select("*")
@@ -35,7 +35,12 @@ export const POST = async (request: Request) => {
 
   const { data, error } = await supabase
     .from("attendees")
-    .insert({ name, email: email.toLowerCase(), company: company || null })
+    .insert({
+      name,
+      email: email.toLowerCase(),
+      table_name: table || null,
+      company: company || null,
+    })
     .select("*")
     .single();
 
