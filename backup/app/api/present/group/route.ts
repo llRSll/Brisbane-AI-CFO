@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/session";
 import { runQuestionGrouping } from "@/lib/runQuestionGrouping";
 
 export const POST = async () => {
-  if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const result = await runQuestionGrouping();
   return NextResponse.json(result);
 };

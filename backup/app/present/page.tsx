@@ -12,11 +12,32 @@ const JoinQR = dynamic(() => import("@/components/JoinQR"), { ssr: false });
 const PresentPage = () => {
   const data = useEventData();
   const [joinUrl, setJoinUrl] = useState("");
+  const [groupStatus, setGroupStatus] = useState<string | null>(null);
+  const [grouping, setGrouping] = useState(false);
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
     setJoinUrl(`${base.replace(/\/$/, "")}/join`);
   }, []);
+
+  const handleGroup = async () => {
+    if (grouping || data.questions.length === 0) return;
+    setGrouping(true);
+    setGroupStatus("Grouping questions…");
+    const response = await fetch("/api/present/group", { method: "POST" });
+    const body = await response.json().catch(() => ({}));
+    setGrouping(false);
+    if (!response.ok) {
+      setGroupStatus("Grouping failed");
+      return;
+    }
+    const engineLabel = body.engine === "openai" ? "AI" : "offline mock";
+    const suffix = body.error ? ` — ${body.error}` : "";
+    setGroupStatus(
+      `Grouped into ${body.clusters} theme(s) via ${engineLabel}${suffix}`,
+    );
+    window.setTimeout(() => setGroupStatus(null), 8000);
+  };
 
   return (
     <main className="present-shell stage-gradient">
@@ -76,11 +97,26 @@ const PresentPage = () => {
         <section className="present-panel col-span-12 row-span-1 lg:col-span-8">
           <div className="present-panel-head">
             <h2 className="section-label">Q&amp;A themes</h2>
-            {data.groupedQuestions.length > 0 ? (
-              <span className="text-xs text-white/45">
-                {data.groupedQuestions.length} topics
-              </span>
-            ) : null}
+            <div className="flex items-center gap-2">
+              {groupStatus ? (
+                <span className="max-w-[14rem] truncate text-xs text-accent-cyan">
+                  {groupStatus}
+                </span>
+              ) : data.groupedQuestions.length > 0 ? (
+                <span className="text-xs text-white/45">
+                  {data.groupedQuestions.length} topics
+                </span>
+              ) : null}
+              <button
+                type="button"
+                onClick={handleGroup}
+                disabled={grouping || data.questions.length === 0}
+                className="rounded-lg border border-brand/40 bg-brand/15 px-3 py-1 text-xs font-semibold text-brand-light transition hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={`Group ${data.questions.length} questions`}
+              >
+                {grouping ? "Grouping…" : `Group ${data.questions.length} questions`}
+              </button>
+            </div>
           </div>
           <div className="present-panel-body">
             <QuestionClusters groups={data.groupedQuestions} present />
