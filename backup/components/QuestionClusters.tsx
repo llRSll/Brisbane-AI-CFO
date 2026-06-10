@@ -17,7 +17,7 @@ const COUNT_COLORS = [
 ];
 
 const emptyMessage =
-  "No grouped themes yet — questions appear here after admin runs Group.";
+  "No grouped themes yet — the host groups questions from the queue in admin.";
 
 const QuestionClusters = ({
   groups,
@@ -45,8 +45,8 @@ const QuestionClusters = ({
         return (
           <li
             key={group.id}
-            className={`animate-pop-in flex items-start gap-3 rounded-xl border border-stage-border/60 bg-stage-bg/40 ${
-              present ? "px-3 py-2" : "panel gap-4 rounded-2xl p-4"
+            className={`animate-pop-in flex items-start gap-3 rounded-xl border border-stage-border bg-stage-bg/80 ${
+              present ? "px-3 py-2" : "p-4"
             }`}
           >
             <span

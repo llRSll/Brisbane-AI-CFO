@@ -23,6 +23,7 @@ export type EventData = {
   pollCounts: number[];
   pollTotal: number;
   loading: boolean;
+  loadError: string | null;
 };
 
 let supabaseClient: ReturnType<typeof createClient> | null = null;
@@ -41,8 +42,20 @@ export const useEventData = (): EventData => {
   const [groups, setGroups] = useState<QuestionGroup[]>([]);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadAll = useCallback(async () => {
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      setLoadError(
+        "Live data is unavailable — the app is not connected to the database.",
+      );
+      setLoading(false);
+      return;
+    }
+
     const supabase = getSupabase();
     const [pollRes, voteRes, questionRes, groupRes, scheduleRes] =
       await Promise.all([
@@ -52,6 +65,19 @@ export const useEventData = (): EventData => {
         supabase.from("question_groups").select("*").order("count", { ascending: false }),
         supabase.from("schedule_items").select("*").order("position", { ascending: true }),
       ]);
+
+    const firstError =
+      pollRes.error ??
+      voteRes.error ??
+      questionRes.error ??
+      groupRes.error ??
+      scheduleRes.error;
+
+    if (firstError) {
+      setLoadError(firstError.message);
+    } else {
+      setLoadError(null);
+    }
 
     setPolls((pollRes.data as Poll[]) ?? []);
     setVotes((voteRes.data as Vote[]) ?? []);
@@ -113,5 +139,6 @@ export const useEventData = (): EventData => {
     pollCounts,
     pollTotal,
     loading,
+    loadError,
   };
 };

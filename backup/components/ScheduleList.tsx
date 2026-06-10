@@ -24,8 +24,8 @@ const ScheduleList = ({ items, large, present = false }: ScheduleListProps) => {
       {items.map((item) => (
         <li
           key={item.id}
-          className={`flex items-start gap-3 rounded-lg border border-stage-border/50 bg-stage-bg/30 ${
-            present ? "px-2.5 py-2" : "panel gap-4 rounded-xl p-4"
+          className={`flex items-start gap-3 rounded-xl border border-stage-border bg-stage-bg/80 ${
+            present ? "px-2.5 py-2" : "p-4"
           }`}
         >
           <div
