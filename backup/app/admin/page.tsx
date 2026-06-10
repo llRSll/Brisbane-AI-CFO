@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useEventData } from "@/components/useEventData";
 
 const AdminLogin = ({ onSuccess }: { onSuccess: () => void }) => {
@@ -24,23 +25,30 @@ const AdminLogin = ({ onSuccess }: { onSuccess: () => void }) => {
 
   return (
     <main className="stage-gradient flex min-h-screen items-center justify-center px-6">
-      <form onSubmit={handleSubmit} className="panel w-full max-w-sm rounded-2xl p-8">
-        <h1 className="text-2xl font-bold">Admin</h1>
-        <p className="mt-1 text-sm text-white/60">Enter the presenter password.</p>
+      <form
+        onSubmit={handleSubmit}
+        className="panel panel-glow w-full max-w-sm rounded-2xl p-8"
+      >
+        <span className="badge">Staff only</span>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">Admin</h1>
+        <p className="mt-2 text-sm text-white/55">
+          Enter the presenter password to run the show.
+        </p>
         <input
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           aria-label="Admin password"
           placeholder="Password"
-          className="mt-6 w-full rounded-lg border border-stage-border bg-stage-bg px-3 py-2 outline-none focus:border-brand"
+          className="input-field mt-6 w-full"
         />
-        {error ? <p className="mt-2 text-sm text-red-300">{error}</p> : null}
-        <button
-          type="submit"
-          className="mt-4 w-full rounded-xl bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark"
-        >
-          Enter
+        {error ? (
+          <p className="mt-2 text-sm text-red-300" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <button type="submit" className="btn-primary mt-5 w-full">
+          Enter dashboard
         </button>
       </form>
     </main>
@@ -54,8 +62,8 @@ const Section = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <section className="panel rounded-2xl p-6">
-    <h2 className="mb-4 text-lg font-semibold text-brand-light">{title}</h2>
+  <section className="panel panel-glow rounded-2xl p-6">
+    <h2 className="section-label mb-4">{title}</h2>
     {children}
   </section>
 );
@@ -164,25 +172,37 @@ const AdminDashboard = () => {
 
   return (
     <main className="stage-gradient min-h-screen px-4 py-6">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Presenter dashboard</h1>
-          <div className="flex items-center gap-4 text-sm text-white/60">
-            <span>{data.questions.length} questions</span>
-            <span>{data.pollTotal} votes</span>
-            <a className="text-brand-light hover:underline" href="/present">
-              Open presenter screen ↗
-            </a>
+      <div className="mx-auto flex max-w-5xl flex-col gap-5">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+              Show control
+            </p>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Presenter dashboard
+            </h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="stat-pill">{data.questions.length} questions</span>
+            <span className="stat-pill">{data.pollTotal} votes</span>
+            <Link
+              href="/present"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-brand/40 bg-brand/10 px-3 py-1.5 text-sm font-medium text-brand-light transition hover:bg-brand/20"
+            >
+              Open presenter ↗
+            </Link>
           </div>
         </header>
 
         {status ? (
-          <p className="rounded-lg bg-brand/15 px-4 py-2 text-sm text-brand-light">
+          <p className="rounded-xl border border-brand/30 bg-brand/10 px-4 py-2.5 text-sm text-brand-light">
             {status}
           </p>
         ) : null}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Section title="Create a poll">
             <form onSubmit={handleCreatePoll} className="flex flex-col gap-3">
               <input
@@ -191,7 +211,7 @@ const AdminDashboard = () => {
                 onChange={(event) => setQuestion(event.target.value)}
                 placeholder="Poll question"
                 aria-label="Poll question"
-                className="rounded-lg border border-stage-border bg-stage-bg px-3 py-2 outline-none focus:border-brand"
+                className="input-field"
               />
               {options.map((option, index) => (
                 <input
@@ -201,7 +221,7 @@ const AdminDashboard = () => {
                   onChange={(event) => handleOptionChange(index, event.target.value)}
                   placeholder={`Option ${index + 1}`}
                   aria-label={`Option ${index + 1}`}
-                  className="rounded-lg border border-stage-border bg-stage-bg px-3 py-2 outline-none focus:border-brand"
+                  className="input-field"
                 />
               ))}
               <div className="flex gap-2">
@@ -209,14 +229,14 @@ const AdminDashboard = () => {
                   <button
                     type="button"
                     onClick={() => setOptions((prev) => [...prev, ""])}
-                    className="rounded-lg border border-stage-border px-3 py-2 text-sm hover:border-brand"
+                    className="rounded-lg border border-stage-border px-3 py-2 text-sm transition hover:border-brand"
                   >
                     + Option
                   </button>
                 ) : null}
                 <button
                   type="submit"
-                  className="flex-1 rounded-lg bg-brand px-3 py-2 font-semibold hover:bg-brand-dark"
+                  className="btn-primary flex-1 !py-2.5 !text-sm"
                 >
                   Create poll
                 </button>
@@ -226,13 +246,13 @@ const AdminDashboard = () => {
 
           <Section title="Polls">
             {data.polls.length === 0 ? (
-              <p className="text-sm text-white/50">No polls yet.</p>
+              <p className="text-sm text-white/45">No polls yet.</p>
             ) : (
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2">
                 {data.polls.map((poll) => (
                   <li
                     key={poll.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-stage-border p-3"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-stage-border/80 bg-stage-bg/40 p-3"
                   >
                     <div className="min-w-0">
                       <p className="truncate font-medium">{poll.question}</p>
@@ -244,7 +264,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={() => handleToggle(poll.id, !poll.is_open)}
-                        className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${
+                        className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                           poll.is_open
                             ? "bg-accent-green/20 text-accent-green"
                             : "border border-stage-border hover:border-brand"
@@ -256,7 +276,7 @@ const AdminDashboard = () => {
                         type="button"
                         onClick={() => handleDeletePoll(poll.id)}
                         aria-label="Delete poll"
-                        className="rounded-lg border border-stage-border px-2 py-1.5 text-sm text-red-300 hover:border-red-400"
+                        className="rounded-lg border border-stage-border px-2 py-1.5 text-sm text-red-300 transition hover:border-red-400"
                       >
                         ✕
                       </button>
@@ -268,24 +288,27 @@ const AdminDashboard = () => {
           </Section>
 
           <Section title="AI Q&A grouping">
-            <p className="mb-3 text-sm text-white/60">
-              Cluster all submitted questions into themes.
+            <p className="mb-4 text-sm leading-relaxed text-white/50">
+              Cluster submitted questions into themes for the presenter screen.
             </p>
             <button
               type="button"
               onClick={handleGroup}
-              className="w-full rounded-lg bg-brand px-3 py-2 font-semibold hover:bg-brand-dark"
+              className="btn-primary w-full !py-2.5 !text-sm"
             >
               Group {data.questions.length} questions
             </button>
             {data.groupedQuestions.length > 0 ? (
               <ul className="mt-4 flex flex-col gap-2 text-sm text-white/80">
                 {data.groupedQuestions.map((group) => (
-                  <li key={group.id} className="flex items-start gap-2">
-                    <span className="shrink-0 rounded-full bg-brand/20 px-2 py-0.5 text-xs font-semibold text-brand-light">
+                  <li
+                    key={group.id}
+                    className="flex items-start gap-2 rounded-lg bg-stage-bg/50 px-3 py-2"
+                  >
+                    <span className="shrink-0 rounded-full bg-brand/20 px-2 py-0.5 text-xs font-bold text-brand-light">
                       {group.questions.length}
                     </span>
-                    <span>
+                    <span className="min-w-0">
                       {group.proposed_question?.trim() ||
                         group.questions[0]?.text ||
                         group.label}
@@ -303,7 +326,7 @@ const AdminDashboard = () => {
                 accept=".docx,.txt,.md,.csv"
                 onChange={handleFile}
                 aria-label="Upload schedule file"
-                className="text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-white"
+                className="text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white"
               />
               <p className="text-xs text-white/40">
                 Word (.docx), text, markdown or CSV — or paste below.
@@ -314,11 +337,11 @@ const AdminDashboard = () => {
                 rows={6}
                 placeholder="Or paste the schedule here…"
                 aria-label="Schedule text"
-                className="rounded-lg border border-stage-border bg-stage-bg px-3 py-2 text-sm outline-none focus:border-brand"
+                className="input-field resize-none text-sm"
               />
               <button
                 type="submit"
-                className="rounded-lg bg-brand px-3 py-2 font-semibold hover:bg-brand-dark"
+                className="btn-primary !py-2.5 !text-sm"
               >
                 Parse & publish agenda
               </button>
@@ -331,21 +354,21 @@ const AdminDashboard = () => {
             <button
               type="button"
               onClick={() => handleReset("votes")}
-              className="rounded-lg border border-stage-border px-3 py-2 text-sm hover:border-brand"
+              className="rounded-lg border border-stage-border px-3 py-2 text-sm transition hover:border-brand"
             >
               Clear votes
             </button>
             <button
               type="button"
               onClick={() => handleReset("questions")}
-              className="rounded-lg border border-stage-border px-3 py-2 text-sm hover:border-brand"
+              className="rounded-lg border border-stage-border px-3 py-2 text-sm transition hover:border-brand"
             >
               Clear questions
             </button>
             <button
               type="button"
               onClick={() => handleReset("all")}
-              className="rounded-lg border border-red-500/40 px-3 py-2 text-sm text-red-300 hover:border-red-400"
+              className="rounded-lg border border-red-500/40 px-3 py-2 text-sm text-red-300 transition hover:border-red-400"
             >
               Clear all
             </button>
@@ -371,7 +394,7 @@ const AdminPage = () => {
   if (!checked) {
     return (
       <main className="stage-gradient flex min-h-screen items-center justify-center">
-        <p className="text-white/50">Loading…</p>
+        <p className="text-white/45">Loading…</p>
       </main>
     );
   }

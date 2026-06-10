@@ -9,6 +9,12 @@ import ScheduleList from "@/components/ScheduleList";
 
 type Tab = "poll" | "qa" | "schedule";
 
+const TABS: { value: Tab; label: string }[] = [
+  { value: "poll", label: "Poll" },
+  { value: "qa", label: "Q&A" },
+  { value: "schedule", label: "Agenda" },
+];
+
 const LivePage = () => {
   const data = useEventData();
   const [tab, setTab] = useState<Tab>("poll");
@@ -61,28 +67,34 @@ const LivePage = () => {
     <main className="stage-gradient min-h-screen px-4 py-6">
       <div className="mx-auto max-w-2xl">
         <header className="mb-6 flex items-center justify-between">
-          <h1 className="text-xl font-bold">Live</h1>
-          <Link href="/" className="text-sm text-white/40 hover:text-white/70">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+              Live hub
+            </p>
+            <h1 className="text-2xl font-bold tracking-tight">You&apos;re in</h1>
+          </div>
+          <Link
+            href="/"
+            className="text-sm text-white/40 transition hover:text-white/70"
+          >
             Home
           </Link>
         </header>
 
-        <nav className="mb-6 flex gap-2" aria-label="Sections">
-          {(
-            [
-              ["poll", "Poll"],
-              ["qa", "Q&A"],
-              ["schedule", "Schedule"],
-            ] as const
-          ).map(([value, label]) => (
+        <nav
+          className="mb-6 flex gap-1 rounded-xl border border-stage-border bg-stage-panel/80 p-1"
+          aria-label="Sections"
+        >
+          {TABS.map(({ value, label }) => (
             <button
               key={value}
               type="button"
               onClick={() => setTab(value)}
-              className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              aria-pressed={tab === value}
+              className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
                 tab === value
-                  ? "bg-brand text-white"
-                  : "panel text-white/70 hover:text-white"
+                  ? "bg-brand text-white shadow-sm"
+                  : "text-white/60 hover:text-white"
               }`}
             >
               {label}
@@ -91,15 +103,18 @@ const LivePage = () => {
         </nav>
 
         {tab === "poll" ? (
-          <section className="panel rounded-2xl p-6">
+          <section className="panel panel-glow rounded-2xl p-6">
             {!data.activePoll ? (
-              <p className="text-center text-white/50">
-                No poll is open right now. Hang tight!
-              </p>
+              <div className="py-8 text-center">
+                <p className="text-white/50">No poll open right now.</p>
+                <p className="mt-1 text-sm text-white/35">
+                  We&apos;ll notify you here when voting starts.
+                </p>
+              </div>
             ) : votedIndex !== null ? (
               <>
-                <p className="mb-4 rounded-lg bg-accent-green/10 px-3 py-2 text-sm text-accent-green">
-                  Thanks for voting! Live results below.
+                <p className="mb-4 rounded-lg border border-accent-green/30 bg-accent-green/10 px-3 py-2 text-sm text-accent-green">
+                  Thanks for voting — live results below.
                 </p>
                 <PollResults
                   poll={data.activePoll}
@@ -109,23 +124,25 @@ const LivePage = () => {
               </>
             ) : (
               <>
-                <h2 className="mb-4 text-xl font-semibold">
+                <h2 className="mb-5 text-xl font-semibold leading-snug">
                   {data.activePoll.question}
                 </h2>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   {data.activePoll.options.map((option, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => handleVote(index)}
-                      className="rounded-xl border border-stage-border px-4 py-3 text-left transition hover:border-brand hover:bg-brand/10"
+                      className="rounded-xl border border-stage-border bg-stage-bg/50 px-4 py-3.5 text-left font-medium transition hover:border-brand hover:bg-brand/10"
                     >
                       {option}
                     </button>
                   ))}
                 </div>
                 {voteError ? (
-                  <p className="mt-3 text-sm text-red-300">{voteError}</p>
+                  <p className="mt-3 text-sm text-red-300" role="alert">
+                    {voteError}
+                  </p>
                 ) : null}
               </>
             )}
@@ -133,42 +150,49 @@ const LivePage = () => {
         ) : null}
 
         {tab === "qa" ? (
-          <section className="flex flex-col gap-6">
-            <form onSubmit={handleSubmitQuestion} className="panel rounded-2xl p-6">
-              <h2 className="mb-3 text-xl font-semibold">Ask a question</h2>
+          <section className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmitQuestion}
+              className="panel panel-glow rounded-2xl p-6"
+            >
+              <h2 className="mb-1 text-lg font-semibold">Ask a question</h2>
+              <p className="mb-4 text-sm text-white/45">
+                Submitted questions are grouped into themes for the panel.
+              </p>
               <textarea
                 value={questionText}
                 onChange={(event) => setQuestionText(event.target.value)}
                 rows={3}
                 maxLength={400}
                 aria-label="Your question"
-                placeholder="What would you like to ask?"
-                className="w-full rounded-lg border border-stage-border bg-stage-bg px-3 py-2 outline-none focus:border-brand"
+                placeholder="What would you like to ask the panel?"
+                className="input-field w-full resize-none"
               />
               {questionError ? (
-                <p className="mt-2 text-sm text-red-300">{questionError}</p>
+                <p className="mt-2 text-sm text-red-300" role="alert">
+                  {questionError}
+                </p>
               ) : null}
               {questionSent ? (
-                <p className="mt-2 text-sm text-accent-green">Question submitted!</p>
+                <p className="mt-2 text-sm text-accent-green">
+                  Question submitted — thank you!
+                </p>
               ) : null}
-              <button
-                type="submit"
-                className="mt-3 w-full rounded-xl bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark"
-              >
+              <button type="submit" className="btn-primary mt-4 w-full">
                 Submit question
               </button>
             </form>
 
-            <div className="panel rounded-2xl p-6">
-              <h2 className="mb-4 text-xl font-semibold">Grouped themes</h2>
+            <div className="panel panel-glow rounded-2xl p-6">
+              <h2 className="mb-4 text-lg font-semibold">Grouped themes</h2>
               <QuestionClusters groups={data.groupedQuestions} />
             </div>
           </section>
         ) : null}
 
         {tab === "schedule" ? (
-          <section className="panel rounded-2xl p-6">
-            <h2 className="mb-4 text-xl font-semibold">Tonight&apos;s agenda</h2>
+          <section className="panel panel-glow rounded-2xl p-6">
+            <h2 className="mb-4 text-lg font-semibold">Today&apos;s agenda</h2>
             <ScheduleList items={data.schedule} />
           </section>
         ) : null}

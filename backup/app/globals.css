@@ -12,15 +12,76 @@ body {
   color: #f5f5fa;
 }
 
-/* Smooth gradient backdrop for stage/big-screen views. */
 .stage-gradient {
   background:
-    radial-gradient(60% 50% at 50% 0%, rgba(99, 102, 241, 0.18), transparent 70%),
-    radial-gradient(40% 40% at 90% 100%, rgba(236, 72, 153, 0.12), transparent 70%),
+    radial-gradient(55% 45% at 50% -10%, rgba(99, 102, 241, 0.22), transparent 65%),
+    radial-gradient(35% 35% at 100% 100%, rgba(236, 72, 153, 0.1), transparent 60%),
+    radial-gradient(30% 30% at 0% 80%, rgba(6, 182, 212, 0.08), transparent 55%),
     theme(colors.stage.bg);
 }
 
 .panel {
   background-color: theme(colors.stage.panel);
   border: 1px solid theme(colors.stage.border);
+}
+
+.panel-glow {
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-xl bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply rounded-xl border border-stage-border px-6 py-3 font-semibold text-white/80 transition hover:border-brand/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand;
+  }
+
+  .input-field {
+    @apply rounded-lg border border-stage-border bg-stage-bg px-3 py-2.5 text-white outline-none transition placeholder:text-white/30 focus:border-brand focus:ring-1 focus:ring-brand/40;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full border border-brand/30 bg-brand/10 px-3 py-0.5 text-xs font-medium uppercase tracking-wider text-brand-light;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-widest text-brand-light;
+  }
+
+  .present-shell {
+    @apply flex h-screen max-h-screen flex-col overflow-hidden px-5 py-4;
+  }
+
+  .present-header {
+    @apply mb-3 flex shrink-0 items-center justify-between gap-4;
+  }
+
+  .present-grid {
+    @apply grid min-h-0 flex-1 grid-cols-12 grid-rows-2 gap-3;
+  }
+
+  .present-panel {
+    @apply flex min-h-0 flex-col overflow-hidden rounded-2xl;
+    background-color: theme(colors.stage.panel);
+    border: 1px solid theme(colors.stage.border);
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.06),
+      0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .present-panel-head {
+    @apply flex shrink-0 items-center justify-between border-b border-stage-border/80 px-4 py-2.5;
+  }
+
+  .present-panel-body {
+    @apply min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-3;
+  }
+
+  .stat-pill {
+    @apply rounded-full border border-stage-border bg-stage-bg/80 px-3 py-1 text-sm tabular-nums text-white/70;
+  }
 }

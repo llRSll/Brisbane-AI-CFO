@@ -25,7 +25,14 @@ export type EventData = {
   loading: boolean;
 };
 
-const supabase = createClient();
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+
+const getSupabase = () => {
+  if (!supabaseClient) {
+    supabaseClient = createClient();
+  }
+  return supabaseClient;
+};
 
 export const useEventData = (): EventData => {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -36,6 +43,7 @@ export const useEventData = (): EventData => {
   const [loading, setLoading] = useState(true);
 
   const loadAll = useCallback(async () => {
+    const supabase = getSupabase();
     const [pollRes, voteRes, questionRes, groupRes, scheduleRes] =
       await Promise.all([
         supabase.from("polls").select("*").order("created_at", { ascending: false }),
@@ -54,6 +62,7 @@ export const useEventData = (): EventData => {
   }, []);
 
   useEffect(() => {
+    const supabase = getSupabase();
     loadAll();
 
     const channel = supabase

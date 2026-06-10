@@ -1,67 +1,99 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useEventData } from "@/components/useEventData";
-import JoinQR from "@/components/JoinQR";
 import PollResults from "@/components/PollResults";
 import QuestionClusters from "@/components/QuestionClusters";
 import ScheduleList from "@/components/ScheduleList";
+
+const JoinQR = dynamic(() => import("@/components/JoinQR"), { ssr: false });
 
 const PresentPage = () => {
   const data = useEventData();
   const [joinUrl, setJoinUrl] = useState("");
 
   useEffect(() => {
-    const base =
-      process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+    const base = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
     setJoinUrl(`${base.replace(/\/$/, "")}/join`);
   }, []);
 
   return (
-    <main className="stage-gradient min-h-screen px-8 py-8">
-      <header className="mb-8 flex items-end justify-between">
-        <h1 className="text-4xl font-bold">Live Event</h1>
-        <p className="text-xl text-white/50">
-          {data.questions.length} questions · {data.pollTotal} votes
-        </p>
+    <main className="present-shell stage-gradient">
+      <header className="present-header">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Brisbane AI CFO
+          </h1>
+          <span className="badge">Live</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="stat-pill">{data.questions.length} questions</span>
+          <span className="stat-pill">{data.pollTotal} votes</span>
+          {data.activePoll ? (
+            <span className="rounded-full border border-accent-green/40 bg-accent-green/15 px-3 py-1 text-sm font-medium text-accent-green">
+              Poll open
+            </span>
+          ) : null}
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <section className="panel flex flex-col items-center justify-center rounded-3xl p-8">
-          <h2 className="mb-6 text-2xl font-semibold">Join now</h2>
-          {joinUrl ? <JoinQR url={joinUrl} size={260} /> : null}
+      <div className="present-grid">
+        <section className="present-panel col-span-12 row-span-1 lg:col-span-3">
+          <div className="present-panel-head">
+            <h2 className="section-label">Join</h2>
+          </div>
+          <div className="present-panel-body flex items-center justify-center">
+            {joinUrl ? <JoinQR url={joinUrl} present /> : null}
+          </div>
         </section>
 
-        <section className="panel rounded-3xl p-8 lg:col-span-2">
-          <h2 className="mb-6 text-2xl font-semibold text-brand-light">
-            Live poll
-          </h2>
-          {data.activePoll ? (
-            <PollResults
-              poll={data.activePoll}
-              counts={data.pollCounts}
-              total={data.pollTotal}
-              large
-            />
-          ) : (
-            <p className="text-center text-xl text-white/40">
-              No poll open right now.
-            </p>
-          )}
+        <section className="present-panel col-span-12 row-span-1 lg:col-span-9">
+          <div className="present-panel-head">
+            <h2 className="section-label">Live poll</h2>
+            {data.activePoll && data.pollTotal > 0 ? (
+              <span className="text-xs tabular-nums text-white/45">
+                {data.pollTotal} votes
+              </span>
+            ) : null}
+          </div>
+          <div className="present-panel-body flex items-center">
+            {data.activePoll ? (
+              <PollResults
+                poll={data.activePoll}
+                counts={data.pollCounts}
+                total={data.pollTotal}
+                present
+              />
+            ) : (
+              <p className="w-full text-center text-sm text-white/40">
+                Waiting for the next poll…
+              </p>
+            )}
+          </div>
         </section>
 
-        <section className="panel rounded-3xl p-8 lg:col-span-2">
-          <h2 className="mb-6 text-2xl font-semibold text-brand-light">
-            Question themes
-          </h2>
-          <QuestionClusters groups={data.groupedQuestions} large />
+        <section className="present-panel col-span-12 row-span-1 lg:col-span-8">
+          <div className="present-panel-head">
+            <h2 className="section-label">Q&amp;A themes</h2>
+            {data.groupedQuestions.length > 0 ? (
+              <span className="text-xs text-white/45">
+                {data.groupedQuestions.length} topics
+              </span>
+            ) : null}
+          </div>
+          <div className="present-panel-body">
+            <QuestionClusters groups={data.groupedQuestions} present />
+          </div>
         </section>
 
-        <section className="panel rounded-3xl p-8">
-          <h2 className="mb-6 text-2xl font-semibold text-brand-light">
-            Agenda
-          </h2>
-          <ScheduleList items={data.schedule} />
+        <section className="present-panel col-span-12 row-span-1 lg:col-span-4">
+          <div className="present-panel-head">
+            <h2 className="section-label">Agenda</h2>
+          </div>
+          <div className="present-panel-body">
+            <ScheduleList items={data.schedule} present />
+          </div>
         </section>
       </div>
     </main>

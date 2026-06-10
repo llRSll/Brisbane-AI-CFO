@@ -9,10 +9,9 @@ When the user asks you to commit changes, push to GitHub immediately after a suc
 
 ## Which repo to use
 
-- **OzGeeOm / Dine For A Dream app** (`ozgeeom/`): commit and push from inside `ozgeeom/` to `https://github.com/llRSll/DineForADream2026.git` (deploys to dine-for-a-dream.vercel.app).
-- **Monorepo root**: only for non-ozgeeom work; pushes to `https://github.com/llRSll/Brisbane-AI-CFO.git`.
-
-Do not push ozgeeom changes only to Brisbane-AI-CFO when the user wants the live app updated.
+- **Brisbane AI CFO** (this repo): commit and push to `https://github.com/llRSll/Brisbane-AI-CFO.git`.
+- Deployable app lives in `backup/` (Vercel root directory).
+- **Dine For A Dream** (archived): separate project at `C:\Users\ruebe\Coding Projects\Dine For A Dream` → `https://github.com/llRSll/DineForADream2026.git`.
 
 ## Push rules
 

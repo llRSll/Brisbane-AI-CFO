@@ -1,13 +1,14 @@
-# Live Event App (backup)
+# Brisbane AI CFO — Live Event App
 
-A live event companion web app: attendees scan a QR code, sign up, vote in
-live polls, and submit questions that an AI engine groups into themes. A
-presenter screen shows everything live on the big screen, and an admin
-dashboard drives the show. Built with Next.js (App Router), Supabase
-(Postgres + Realtime), and the Vercel AI SDK.
+A live event companion web app for the Brisbane AI CFO conference: attendees
+scan a QR code, sign up, vote in live polls, and submit questions that an AI
+engine groups into themes. A presenter screen shows everything live on the big
+screen, and an admin dashboard drives the show. Built with Next.js (App Router),
+Supabase (Postgres + Realtime), and the Vercel AI SDK.
 
-This `backup/` copy is the complete, bulletproof version — the safety net for
-the live demo.
+This `backup/` folder is the **deployable production app**. It powers both the
+primary and backup Vercel stacks. See [`DEMO_RUNBOOK.md`](DEMO_RUNBOOK.md) for
+URLs and failover steps.
 
 ## Features
 
@@ -72,11 +73,20 @@ Open http://localhost:3000.
 
 ## Deploy (Vercel)
 
-1. Push to GitHub.
-2. Import the repo at https://vercel.com/new.
-3. Add the same environment variables in the Vercel project settings.
-4. Deploy. Set `NEXT_PUBLIC_BASE_URL` to your production URL so the QR code
-   points to the right place.
+Two Vercel projects connect to `llRSll/Brisbane-AI-CFO` with **Root Directory:
+`backup`**:
+
+| Stack | URL |
+|-------|-----|
+| Live | https://brisbane-ai-cfo.vercel.app |
+| Backup | https://brisbane-ai-cfo-842x.vercel.app |
+
+1. Push to `main` on GitHub (auto-deploys via Vercel Git integration).
+2. Set environment variables per project (see `DEMO_RUNBOOK.md`).
+3. `NEXT_PUBLIC_BASE_URL` must match **that project's own URL** so the QR
+   code points to the correct `/join` path.
+
+CI runs on every push via GitHub Actions (lint + build in `backup/`).
 
 ## Architecture notes
 

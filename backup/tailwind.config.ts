@@ -28,6 +28,9 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
+      boxShadow: {
+        glow: "0 0 40px rgba(99, 102, 241, 0.15)",
+      },
       keyframes: {
         "pop-in": {
           "0%": { transform: "scale(0.92)", opacity: "0" },
